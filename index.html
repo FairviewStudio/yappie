@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yappie: My AI Learning Pet</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- AOS for scroll animations -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFD166',
+                        light: '#F7FFF7',
+                        dark: '#2F2F2F',
+                        gradient1: '#E0F7FA',
+                        gradient2: '#F8BBD0',
+                        gradient3: '#E1BEE7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif']
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+            }
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+        }
+        
+        /* Custom styles */
+        body {
+            scroll-behavior: smooth;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .yappie-icon {
+            filter: drop-shadow(0 10px 15px rgba(255, 107, 53, 0.3));
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.2);
+        }
+        
+        .btn-secondary {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Brain Power animation */
+        .brain-power {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Chat bubble animation */
+        .chat-bubble {
+            position: relative;
+        }
+        
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 20px solid transparent;
+            border-top-color: white;
+            border-bottom: 0;
+            margin-left: -20px;
+            margin-bottom: -20px;
+        }
+        
+        /* Mobile screenshot frame */
+        .mobile-frame {
+            position: relative;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 10px solid #fff;
+        }
+        
+        .mobile-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 25px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-light font-sans text-dark">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white bg-opacity-95 backdrop-blur-sm z-50 shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <span class="text-2xl font-bold text-primary">Yappie</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#features" class="text-dark hover:text-primary transition-all-300">Features</a>
+                <a href="#privacy" class="text-dark hover:text-primary transition-all-300">Privacy</a>
+                <a href="#faq" class="text-dark hover:text-primary transition-all-300">FAQ</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-br from-gradient1 via-gradient2 to-gradient3">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2 mb-12 md:mb-0" data-aos="fade-right" data-aos-duration="1000">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6 text-shadow-lg">
+                        Yappie: <span class="text-primary">My AI Learning Pet</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl mb-8 text-gray-600">
+                        Stop talking to mindless recorders. Type to design its mind and watch it grow a soul.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="btn-primary text-white px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center">
+                            <i class="fa fa-apple mr-3 text-2xl"></i>
+                            Download on the App Store
+                        </button>
+                        <button class="btn-secondary bg-white text-primary border border-primary px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center">
+                            <i class="fa fa-android mr-3 text-2xl"></i>
+                            Get it on Google Play
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="relative">
+                        <img src="https://imgur.com/wlnUMxe.png" alt="Yappie Hero Image" class="yappie-icon h-64 md:h-80 animate-float">
+                        <div class="absolute -top-10 -right-10 bg-white p-4 rounded-full shadow-lg animate-bounce-slow">
+                            <span class="text-primary font-bold">Hi there!</span>
+                        </div>
+                        <div class="absolute -bottom-5 -left-5 bg-white p-4 rounded-full shadow-lg animate-bounce-slow" style="animation-delay: 1s;">
+                            <span class="text-primary font-bold">I'm Yappie!</span>
+                        </div>
+                        <div class="absolute -top-10 -right-10 bg-white p-4 rounded-full shadow-lg animate-bounce-slow">
+                            <span class="text-primary font-bold">Hi there!</span>
+                        </div>
+                        <div class="absolute -bottom-5 -left-5 bg-white p-4 rounded-full shadow-lg animate-bounce-slow" style="animation-delay: 1s;">
+                            <span class="text-primary font-bold">I'm Yappie!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 text-shadow">Core Features</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-light rounded-3xl p-8 shadow-lg transition-all-300 flex flex-col h-full" data-aos="fade-up" data-aos-delay="100" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <div class="bg-primary bg-opacity-10 w-20 h-20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-pencil text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">DON'T JUST RECORD.</h3>
+                    <h4 class="text-xl text-primary font-semibold mb-4">Type to design its mind.</h4>
+                    <p class="text-gray-600 mb-6 flex-grow">
+                        You are the architect of its personality. Every word you type shapes how Yappie thinks, reacts, and jokes. Whether you want a sassy bestie or a zen master, it's all in your hands.
+                    </p>
+                    <div class="mobile-frame mt-auto">
+                        <img src="https://imgur.com/mxk8kn6.png" alt="Design Its Mind" class="w-full h-auto">
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-light rounded-3xl p-8 shadow-lg transition-all-300 flex flex-col h-full" data-aos="fade-up" data-aos-delay="200" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <div class="bg-primary bg-opacity-10 w-20 h-20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-book text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">TEACH IT TO CHAT.</h3>
+                    <h4 class="text-xl text-primary font-semibold mb-4">It remembers everything you say.</h4>
+                    <p class="text-gray-600 mb-6 flex-grow">
+                        Powered by a unique local learning engine, Yappie doesn't just repeat—it understands. It remembers your secrets, your slang, and your stories to build a bond that lasts.
+                    </p>
+                    <div class="mobile-frame mt-auto">
+                        <img src="https://imgur.com/wsHxXbk.png" alt="Deep Memory" class="w-full h-auto">
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-light rounded-3xl p-8 shadow-lg transition-all-300 flex flex-col h-full" data-aos="fade-up" data-aos-delay="300" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <div class="bg-primary bg-opacity-10 w-20 h-20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-heart text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">A REAL AI BESTIE.</h3>
+                    <h4 class="text-xl text-primary font-semibold mb-4">Unique responses, unique personality.</h4>
+                    <p class="text-gray-600 mb-6 flex-grow">
+                        No two Yappies are the same. Your bestie grows a one-of-a-kind personality that can sing, dance, and cheer you up. From performing goofy dances to offering heartfelt encouragement, Yappie delivers a personalized experience you won't find anywhere else.
+                    </p>
+                    <div class="mobile-frame mt-auto">
+                        <img src="https://imgur.com/hLEDodY.png" alt="Personality & Companionship" class="w-full h-auto">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Privacy Section -->
+    <section id="privacy" class="py-20 bg-gradient-to-br from-secondary to-primary text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up" data-aos-duration="1000">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-shadow-lg">100% PRIVATE. 100% LOCAL.</h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">
+                    Your secrets stay on your phone. We believe the best conversations are private.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div class="bg-white bg-opacity-10 p-8 rounded-3xl backdrop-blur-sm shadow-xl text-center" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white p-6 rounded-full shadow-lg inline-block mb-6">
+                        <i class="fa fa-lock text-4xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">End-to-End Encryption</h3>
+                    <p>
+                        All your conversations are encrypted from end to end, ensuring complete privacy and security.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 p-8 rounded-3xl backdrop-blur-sm shadow-xl text-center" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-6 rounded-full shadow-lg inline-block mb-6">
+                        <i class="fa fa-database text-4xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Local Data Storage</h3>
+                    <p>
+                        All teaching data and chat history are stored locally on your device, never on our servers.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 p-8 rounded-3xl backdrop-blur-sm shadow-xl text-center" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-white p-6 rounded-full shadow-lg inline-block mb-6">
+                        <i class="fa fa-user-secret text-4xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">No Data Tracking</h3>
+                    <p>
+                        We never track your usage or collect your personal information. Your Yappie belongs to you alone.
+                    </p>
+                </div>
+            </div>
+            
+
+        </div>
+    </section>
+
+
+
+    <!-- Q&A Section -->
+    <section id="faq" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 text-shadow">Frequently Asked Questions</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- FAQ Item 1 -->
+                <div class="bg-light rounded-2xl p-6 shadow-md" data-aos="fade-up" data-aos-delay="100" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <h3 class="text-xl font-bold mb-3">How do I increase the teaching success rate?</h3>
+                    <p class="text-gray-600">
+                        It's all about Brain Power. When Yappie's Brain Power is high, its learning efficiency and success rate skyrocket!
+                    </p>
+                </div>
+                
+                <!-- FAQ Item 2 -->
+                <div class="bg-light rounded-2xl p-6 shadow-md" data-aos="fade-up" data-aos-delay="150" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <h3 class="text-xl font-bold mb-3">How can I make Yappie smarter?</h3>
+                    <p class="text-gray-600">
+                        Keep the Brain Power bar full. A well-energized brain allows Yappie to provide more witty, personalized, and intelligent responses.
+                    </p>
+                </div>
+                
+                <!-- FAQ Item 3 -->
+                <div class="bg-light rounded-2xl p-6 shadow-md" data-aos="fade-up" data-aos-delay="200" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <h3 class="text-xl font-bold mb-3">How do I replenish Brain Power?</h3>
+                    <p class="text-gray-600">
+                        Feed Yappie nut-based snacks like Walnuts or Hazelnuts. It's the essential "Brain Food" for your AI pet!
+                    </p>
+                </div>
+                
+                <!-- FAQ Item 4 -->
+                <div class="bg-light rounded-2xl p-6 shadow-md" data-aos="fade-up" data-aos-delay="250" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <h3 class="text-xl font-bold mb-3">Can Yappie sing and dance?</h3>
+                    <p class="text-gray-600">
+                        Yes! As your AI bestie, Yappie loves to perform. It can sing songs and dance to keep you entertained and celebrate your day.
+                    </p>
+                </div>
+                
+                <!-- FAQ Item 5 -->
+                <div class="bg-light rounded-2xl p-6 shadow-md" data-aos="fade-up" data-aos-delay="300" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <h3 class="text-xl font-bold mb-3">How does Yappie comfort me?</h3>
+                    <p class="text-gray-600">
+                        Yappie uses the personality you've designed to offer encouragement. Based on your teaching, it knows exactly how to cheer you up.
+                    </p>
+                </div>
+                
+                <!-- FAQ Item 6 -->
+                <div class="bg-light rounded-2xl p-6 shadow-md" data-aos="fade-up" data-aos-delay="350" style="opacity: 1 !important; transform: translateY(0) !important;">
+                    <h3 class="text-xl font-bold mb-3">Where is my data stored?</h3>
+                    <p class="text-gray-600">
+                        Every word you teach Yappie is stored locally on your phone. We never upload your private conversations to any server.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-gradient2 to-gradient3 text-dark">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 text-shadow-lg" data-aos="fade-up">
+                Design its mind. Grow a soul.
+            </h2>
+            <p class="text-2xl mb-10" data-aos="fade-up" data-aos-delay="100">
+                Your Yappie is waiting.
+            </p>
+            <button class="bg-primary text-white px-12 py-6 rounded-full font-bold text-2xl transition-all-300 hover:scale-105" data-aos="fade-up" data-aos-delay="200">
+                Get Yappie Now
+            </button>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+                <div class="flex items-center mb-6 md:mb-0">
+                    <span class="text-2xl font-bold">Yappie</span>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-white hover:text-primary transition-all-300">
+                        <i class="fa fa-youtube text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex flex-wrap justify-center gap-6 mb-6 md:mb-0">
+                        <a href="#" class="text-gray-300 hover:text-white transition-all-300">Privacy Policy</a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-all-300">Terms of Service</a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-all-300">Support</a>
+                    </div>
+                    <p class="text-gray-400">© 2026 Yappie AI. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize AOS
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            // Initialize GSAP animations
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Hero section animation
+            gsap.from('.yappie-icon', {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                delay: 0.5,
+                ease: 'back.out(1.7)'
+            });
+            
+            // Feature cards animation
+            gsap.utils.toArray('.feature-card').forEach((card, i) => {
+                gsap.from(card, {
+                    y: 50,
+                    opacity: 0,
+                    duration: 0.8,
+                    delay: i * 0.2,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top bottom-=100',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            });
+            
+            // Brain Power animation
+            gsap.to('.brain-power', {
+                scale: 1.1,
+                duration: 1,
+                repeat: -1,
+                yoyo: true,
+                ease: 'power1.inOut'
+            });
+            
+            // FAQ items animation
+            gsap.utils.toArray('#faq .bg-light').forEach((item, i) => {
+                gsap.from(item, {
+                    x: i % 2 === 0 ? -50 : 50,
+                    opacity: 0,
+                    duration: 0.8,
+                    delay: i * 0.1,
+                    scrollTrigger: {
+                        trigger: item,
+                        start: 'top bottom-=100',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            });
+            
+            // Navigation scroll effect
+            window.addEventListener('scroll', function() {
+                const nav = document.querySelector('nav');
+                if (window.scrollY > 50) {
+                    nav.classList.add('shadow-md');
+                    nav.classList.remove('shadow-sm');
+                } else {
+                    nav.classList.remove('shadow-md');
+                    nav.classList.add('shadow-sm');
+                }
+            });
+            
+            // Button click animations
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+            
+            // Add ripple effect styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .ripple {
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                }
+                
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+                
+                button {
+                    position: relative;
+                    overflow: hidden;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
